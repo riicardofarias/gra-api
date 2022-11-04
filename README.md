@@ -10,7 +10,7 @@ Visando a compatibilidade durante a execução do projeto, foi utilizado o Java 
 - [Java](https://www.oracle.com/java/technologies/javase/jdk13-archive-downloads.html) - (v13)
 
 ### ✅️ Execução do projeto
-Para realizar a instalação das dependências e rodar os testes unitários, basta executar o comando abaixo:
+Para realizar a instalação das dependências e rodar os testes unitários, basta executar o comando abaixo no diretório do projeto:
 ```sh
     mvn clean install
 ````
