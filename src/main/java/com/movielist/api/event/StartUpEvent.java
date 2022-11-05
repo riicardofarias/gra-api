@@ -1,6 +1,5 @@
 package com.movielist.api.event;
 
-import com.movielist.api.config.MovieProps;
 import com.movielist.api.dto.MovieSaveDTO;
 import com.movielist.api.service.MovieService;
 import com.movielist.api.util.FileReaderUtil;
@@ -19,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class StartUpEvent implements ApplicationListener<ContextRefreshedEvent> {
     private final MovieService movieService;
 
-    @Value("#{movieProps.path}")
+    @Value("classpath:data/movielist.csv")
     private Resource resource;
 
     @SneakyThrows

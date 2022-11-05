@@ -11,9 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -68,26 +66,34 @@ public class MovieService {
      */
     private List<MovieIntervalDTO> getIntervals() {
         // Obtém a lista de filmes vencedores ordenados por ano de produção
-        var movies = movieRepository.findAllByWinnerIsTrue(Sort.by(Sort.Direction.ASC,"year", "producers"));
+        var movies = movieRepository.findAllByWinnerIsTrue(
+            Sort.by(Sort.Direction.ASC,"year", "producers")
+        );
 
-        // Agrupa os filmes pelo nome do produtor
-        var grouped = movies.stream().collect(Collectors.groupingBy(Movie::getProducers));
+        // Separa o nome dos produtores
+        var filtered = movies.stream()
+            .flatMap(e -> Arrays.stream(e.getProducers().split(",|and")))
+            .filter(e -> !e.isBlank())
+            .map(String::trim)
+        .collect(Collectors.toSet());
 
         // Lista de intervalos
         var intervals = new ArrayList<MovieIntervalDTO>();
 
-        for(var e : grouped.entrySet()) {
-            var producer = e.getKey();
+        for(var producer : filtered) {
+            var producerMovies = movies.stream()
+                .filter(e -> e.getProducers().contains(producer))
+            .collect(Collectors.toList());
 
             // Itera a lista de filmes
-            for(var i = 0; i < e.getValue().size(); i++) {
+            for(var i = 0; i < producerMovies.size(); i++) {
                 // Verifica se possui um próximo registro para iterar
-                if(i + 1 == e.getValue().size()) {
+                if(i + 1 == producerMovies.size()) {
                     continue;
                 }
 
-                var year = e.getValue().get(i).getYear();
-                var nextYear = e.getValue().get(i + 1).getYear();
+                var year = producerMovies.get(i).getYear();
+                var nextYear = producerMovies.get(i + 1).getYear();
                 var interval = nextYear - year;
 
                 intervals.add(new MovieIntervalDTO(

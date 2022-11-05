@@ -31,9 +31,9 @@ public class MovieControllerTest {
     private int port;
 
     @Test
-    void movieListGetSuccessful() {
-        var min = new MovieIntervalDTO("Bo Derek", 1, 1990, 1991);
-        var max = new MovieIntervalDTO("Allan Carr", 4, 1980, 1984);
+    void whenIntervalIsSuccessful() {
+        var min = new MovieIntervalDTO("Joel Silver", 1, 1990, 1991);
+        var max = new MovieIntervalDTO("Matthew Vaughn", 13, 2002, 2015);
         var fake = new MovieListDTO(List.of(min), List.of(max));
 
         var url  = String.format("http://localhost:%s", port);
@@ -44,5 +44,21 @@ public class MovieControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody()).isEqualTo(fake);
+    }
+
+    @Test
+    void whenIntervalIsWrong() {
+        var min = new MovieIntervalDTO("Bo Derek", 1, 1990, 1990);
+        var max = new MovieIntervalDTO("Allan Carr", 4, 1980, 1985);
+        var fake = new MovieListDTO(List.of(min), List.of(max));
+
+        var url  = String.format("http://localhost:%s", port);
+        var response = restTemplate.exchange(url, HttpMethod.GET,
+            new HttpEntity<>(new HttpHeaders()), new ParameterizedTypeReference<MovieListDTO>() {}
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody()).isNotEqualTo(fake);
     }
 }
